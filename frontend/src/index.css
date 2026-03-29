@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-blue: #005DC2;
+  --brand-gold: #AD9915;
+  --brand-yellow: #FFE23E;
+  --bg-main: #f1f5f9;
+  --dark-deep: #0f172a;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-bg-main text-slate-900;
+}
+
+/* Custom Scrollbar */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+}
