@@ -70,3 +70,14 @@ Total semejantes detectados en base de datos: 10
 - **Veracidad Absoluta**: Los códigos SNIES recuperados existen realmente en el sistema nacional; no son datos simulados, lo que aporta confianza total al líder académico.
 
 **En conclusión**: La sección cumple plenamente su función. Automatiza la búsqueda de competidores directos y complementarios basándose en la realidad del mercado colombiano, operando con una arquitectura ligera de frontend que no sobrecarga el backend.
+
+## 6. Ajustes Estéticos y de Formato (Márgenes)
+Durante el desarrollo, se identificó una inconsistencia en los márgenes de las páginas generadas después de la Metodología (como la Tabla de Contenido y las secciones de datos).
+
+### Problema:
+Debido a la naturaleza de los "page-breaks" en la generación de PDF mediante navegadores, el `padding-top` definido en el contenedor principal solo se aplicaba a la primera página de contenido. Esto causaba que las secciones siguientes aparecieran demasiado pegadas al borde superior de la hoja.
+
+### Solución Aplicada:
+- **Descentralización del Margen**: Se eliminó el padding superior del contenedor global `.doc-padding-wrap`.
+- **Margen por Encabezado**: Se inyectó un `padding-top: 30mm` directamente en el estilo global de los elementos `h1` en `reportTemplate.ts`.
+- **Resultado**: Como cada sección importante comienza con un `h1` y un salto de página, se garantiza que todas las páginas del informe mantengan un margen superior idéntico de 30mm, preservando la estética premium y la simetría en todo el documento impreso.

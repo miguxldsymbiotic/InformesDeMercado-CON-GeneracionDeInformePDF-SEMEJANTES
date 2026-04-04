@@ -156,7 +156,7 @@ export const generateReportHTML = (data: ReportData): string => {
     .cover-pattern { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; }
     .cover-main-h1 { font-size: 42pt; font-weight: 800; color: #fff !important; line-height: 1.1; letter-spacing: -1pt; }
     .cover-program-info { font-size: 20pt; border-left: 5pt solid #fff; padding-left: 20pt; margin-top: 35pt; color: #fff !important; line-height: 1.4; }
-    .doc-padding-wrap { padding: 30mm 20mm 35mm 35mm; width: 100%; text-align: justify; margin-top: 279.4mm; }
+    .doc-padding-wrap { padding: 0mm 20mm 35mm 35mm; width: 100%; text-align: justify; margin-top: 279.4mm; }
     
     /* FOOTER */
     .page-footer { position: fixed; bottom: 5mm; left: 35mm; right: 20mm; height: 12mm; border-top: 1.5pt solid #000; font-size: 9.5pt; color: #000; background: #fff; z-index: 500; padding-top: 6pt; }
@@ -165,7 +165,7 @@ export const generateReportHTML = (data: ReportData): string => {
     .footer-watermark { position: absolute; right: 0; bottom: -5pt; height: 35pt; opacity: 0.08; pointer-events: none; }
     
     /* SECTION HANDLING */
-    h1 { font-size: 16pt; font-weight: bold; text-transform: uppercase; border-bottom: 3.5pt solid #000; padding-bottom: 6pt; margin-bottom: 25pt; page-break-before: always; color: #000 !important; counter-increment: page; }
+    h1 { padding-top: 30mm; font-size: 16pt; font-weight: bold; text-transform: uppercase; border-bottom: 3.5pt solid #000; padding-bottom: 6pt; margin-bottom: 25pt; page-break-before: always; color: #000 !important; counter-increment: page; }
     h3 { font-size: 12.5pt; margin-top: 25pt; margin-bottom: 12pt; font-weight: bold; color: #2E3192 !important; border-left: 3pt solid #2E3192; padding-left: 10pt; }
     
     /* TABLES */
