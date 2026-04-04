@@ -77,7 +77,8 @@ Durante el desarrollo, se identificó una inconsistencia en los márgenes de las
 ### Problema:
 Debido a la naturaleza de los "page-breaks" en la generación de PDF mediante navegadores, el `padding-top` definido en el contenedor principal solo se aplicaba a la primera página de contenido. Esto causaba que las secciones siguientes aparecieran demasiado pegadas al borde superior de la hoja.
 
-### Solución Aplicada:
-- **Descentralización del Margen**: Se eliminó el padding superior del contenedor global `.doc-padding-wrap`.
-- **Margen por Encabezado**: Se inyectó un `padding-top: 30mm` directamente en el estilo global de los elementos `h1` en `reportTemplate.ts`.
-- **Resultado**: Como cada sección importante comienza con un `h1` y un salto de página, se garantiza que todas las páginas del informe mantengan un margen superior idéntico de 30mm, preservando la estética premium y la simetría en todo el documento impreso.
+### Solución Definitiva (Implementada):
+- **Uso de Reglas @page**: Se migró de una configuración manual a un sistema basado en `@page { margin: 30mm 20mm 35mm 35mm; }`. Esto garantiza que **todas** las páginas de contenido (incluyendo continuaciones) tengan el margen superior correcto.
+- **Excepción de Portada**: Se utilizó la regla `@page:first { margin: 0; }` para que la portada mantenga su diseño de sangrado completo (full-bleed) sin bordes blancos.
+- **Sincronización de Salto**: Se ajustó la portada con `page-break-after: always` para asegurar una transición limpia al contenido con margen automático.
+- **Resultado**: Simetría profesional en el 100% de las páginas del reporte, sin importar la longitud de las tablas o gráficas.
