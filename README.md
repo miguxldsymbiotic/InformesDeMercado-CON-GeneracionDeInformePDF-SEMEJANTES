@@ -47,4 +47,35 @@ El sistema procesa y normaliza datos de las siguientes fuentes gubernamentales:
 3. Ejecuta en modo desarrollo: `npm run dev`.
 
 ---
+---
 **Intelligence Unit // Symbiotic Analytics**
+
+## 📝 Guía de Ejecución Rápida (Local)
+
+Para garantizar que el sistema funcione correctamente en un entorno local, se han realizado las siguientes configuraciones:
+
+### 1. Configuración del Entorno (Frontend)
+Se requiere que el frontend conozca la ubicación del backend. 
+- Se ha creado un archivo `frontend/.env` con la variable: `VITE_API_URL=http://localhost:8000`.
+- **Nota de Robustez**: Se modificó `frontend/src/services/api.ts` para incluir un fallback automático a `http://127.0.0.1:8000` en caso de que Vite no cargue el archivo `.env` correctamente.
+
+### 2. Comandos de Inicio
+
+**Backend:**
+```bash
+cd backend
+pip install -r requirements.txt
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 3. Verificación de Conexión
+- El backend debe responder en `http://localhost:8000`.
+- El frontend estará disponible en `http://localhost:5173`.
+- Si el frontend muestra errores de JSON ("Unexpected token <"), asegúrese de que el backend esté corriendo y que la URL coincida con la configurada en `api.ts`.

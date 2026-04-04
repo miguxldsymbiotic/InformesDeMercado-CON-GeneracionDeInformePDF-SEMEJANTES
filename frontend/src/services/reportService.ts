@@ -45,6 +45,7 @@ export interface ReportData {
     saberProProgram: SaberProDashboardData;
     saberProArea: SaberProDashboardData;
     demographics: DemographicDistribution;
+    similarPrograms: ProgramOption[];
     
     generatedAt: string;
 }
@@ -171,6 +172,29 @@ export const collectReportData = async (program: ProgramOption): Promise<ReportD
         safeFetch(fetchDemographicDistribution({ codigo_snies: [program.snies] }), emptyDemographics, 'demographics'),
     ]);
 
+    // ENCUENTRA PROGRAMAS SEMEJANTES (CLIENT-SIDE)
+    const allProgs = await getPrograms();
+    const findSimilar = (target: ProgramOption, others: ProgramOption[]) => {
+        const stopWords = new Set(['de', 'la', 'el', 'en', 'y', 'con', 'para', 'o', 'un', 'una', 'del', 'al']);
+        const tokens = target.programa.toLowerCase()
+            .split(/[\s,.-]+/)
+            .filter(t => t.length > 2 && !stopWords.has(t));
+        
+        return others
+            .filter(p => p.snies !== target.snies) // No soy yo mismo
+            .map(p => {
+                const pTokens = p.programa.toLowerCase().split(/[\s,.-]+/);
+                const matches = tokens.filter(t => pTokens.some(pt => pt.includes(t)));
+                return { program: p, score: matches.length };
+            })
+            .filter(res => res.score >= Math.min(tokens.length, 2)) // Al menos 2 coincidencias o todas si son pocas
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10)
+            .map(res => res.program);
+    };
+
+    const similarPrograms = findSimilar(program, allProgs);
+
     return {
         program, programKPIs, areaKPIs, nbcKPIs, nivelKPIs, nacionalKPIs,
         matriculaEvolution, pcursoEvolution, graduadosEvolution, desercionEvolution,
@@ -178,6 +202,7 @@ export const collectReportData = async (program: ProgramOption): Promise<ReportD
         sectorMatriculaEvolution, sectorPcursoEvolution, sectorGraduadosEvolution, sectorDesercionEvolution, sectorKPIs,
         modalityMatriculaEvolution, modalityPcursoEvolution, modalityGraduadosEvolution, modalityDesercionEvolution, modalityKPIs,
         saberProProgram, saberProArea, demographics,
+        similarPrograms,
         generatedAt: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }),
     };
 };

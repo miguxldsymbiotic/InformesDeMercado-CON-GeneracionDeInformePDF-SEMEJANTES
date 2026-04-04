@@ -1,0 +1,17 @@
+Vista registrada: df_Cobertura_distinct
+Vista registrada: df_Graduados_agg
+Vista registrada: df_Matricula_agg
+Vista registrada: df_OLE_Movilidad
+Vista registrada: df_OLE_Movilidad_M0
+Vista registrada: df_OLE_Salario
+Vista registrada: df_OLE_Salario_M0
+Vista registrada: df_PCurso_agg
+Vista registrada: df_SaberPRO
+Vista registrada: df_SaberPRO_mean
+Vista registrada: df_SNIES_Programas
+Vista registrada: df_SPADIES_Desercion
+Vista registrada: df_SPADIES_Retencion
+Registered calculated view: df_Desercion_Posgrado_Proxy
+Registered calculated view: df_Master_Indicadores
+Registered calculated view: df_Dimension_Filtros
+INFO:     127.0.0.1:65019 - "GET /national/kpis?sector=Privada HTTP/1.1" 200 OK

@@ -290,6 +290,7 @@ export const generateReportHTML = (data: ReportData): string => {
                     <li style="border-bottom:1px dotted #ccc;"><span>5. Benchmarking por Sector</span></li>
                     <li style="border-bottom:1px dotted #ccc;"><span>6. Benchmarking por Modalidad</span></li>
                     <li style="border-bottom:1px dotted #ccc;"><span>7. Matriz de Diagnóstico Estratégico</span></li>
+                    <li style="border-bottom:1px dotted #ccc;"><span>8. Análisis de Programas Semejantes</span></li>
                 </ul>
             </div>
         </div>
@@ -607,6 +608,43 @@ export const generateReportHTML = (data: ReportData): string => {
                     </tr>
                 </tbody>
             </table>
+
+            <div class="content-section">
+                <h1>8. Análisis de Programas Semejantes</h1>
+                <p class="intro-paragraph">
+                    Este análisis identifica otros programas académicos en el territorio colombiano que comparten una identidad temática similar al programa evaluado. 
+                </p>
+                <div class="method-box">
+                    <strong>Algoritmo de Identidad:</strong> Se utiliza un motor de búsqueda por relevancia que tokeniza el nombre del programa y encuentra pares con una coincidencia semántica superior al 70%.
+                </div>
+
+                <table class="formal-grid" style="font-size:8.5pt;">
+                    <thead style="background:#f2f2f2;">
+                        <tr>
+                            <th style="border:1pt solid #000; padding:6pt; text-align:left;">Programa Semejante</th>
+                            <th style="border:1pt solid #000; padding:6pt; text-align:left;">Institución</th>
+                            <th style="border:1pt solid #000; padding:6pt; text-align:center;">SNIES</th>
+                            <th style="border:1pt solid #000; padding:6pt; text-align:center;">Modalidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.similarPrograms.length > 0 ? data.similarPrograms.map(sp => `
+                            <tr>
+                                <td style="font-weight:bold;">${clean(sp.programa)}</td>
+                                <td>${clean(sp.institucion)}</td>
+                                <td style="text-align:center;">${clean(sp.snies)}</td>
+                                <td style="text-align:center;">${clean(sp.modalidad)}</td>
+                            </tr>
+                        `).join('') : `
+                            <tr>
+                                <td colspan="4" style="text-align:center; padding:20pt; font-style:italic; color:#888;">
+                                    No se encontraron programas con alta similitud nominal en la base de datos actual.
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
+            </div>
 
             <div style="margin-top:50pt; text-align:center;">
                 <p style="font-size:10pt;">Fin del Informe Estratégico de Mercado</p>

@@ -1,12 +1,9 @@
-// Lee la URL de la API desde las variables de entorno de Vite.
-const API_URL = import.meta.env.VITE_API_URL;
+// Lee la URL de la API desde las variables de entorno de Vite o usa el valor local por defecto.
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-// Esta comprobación detendrá la aplicación si la variable de entorno no fue configurada
-// durante el proceso de build. Esto es preferible a tener URLs rotas.
-// Para desarrollo local, asegúrate de tener el archivo `frontend/.env` con VITE_API_URL.
+// Esta comprobación sólo alerta si sigue faltando, aunque el fallback debería evitar errores críticos.
 if (!API_URL) {
     console.error("REVISA EL ARCHIVO DE GITHUB (WORKFLOW) PARA LA VARIABLE DE ENTORNO VITE_API_URL");
-    // En Azure, esto siempre será undefined si el YAML no la tiene.
 }
 
 export interface FilterParams {
