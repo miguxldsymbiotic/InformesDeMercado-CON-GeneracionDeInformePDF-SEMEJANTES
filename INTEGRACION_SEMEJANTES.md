@@ -30,7 +30,6 @@ La visualización en el PDF se integra como el **Capítulo 8** del informe estra
     - **Institución**: La universidad o IES que lo oferta.
     - **SNIES**: El código único de identificación oficial.
     - **Modalidad**: Para entender si la competencia es presencial, virtual o a distancia.
-- **Mecanismo de Resiliencia**: Si el algoritmo no encuentra al menos un par similar con alta confianza en la base de datos nacional, la sección mostrará un mensaje indicando que no hay pares nominales exactos, protegiendo así la veracidad del análisis.
 
 ## 4. Ejemplo Práctico: SNIES 2051
 Al analizar el programa **Administración de Empresas**, el sistema realiza el siguiente flujo:
@@ -42,10 +41,6 @@ Al analizar el programa **Administración de Empresas**, el sistema realiza el s
     - *Administración de Empresas y Negocios Internacionales*.
 
 Este nivel de detalle permite al líder académico entender rápidamente su entorno competitivo directo basándose únicamente en la oferta nominal oficial del sistema.
-
----
-*Documento Técnico de Proyecto - SymbiAnalytics Intelligence Unit*
-*Última actualización: Abril 2026*
 
 ## 5. Prueba de Validación Real
 Para confirmar la efectividad del sistema, se realizó una ejecución de prueba utilizando los datos vivos del backend. Aquí tiene el resultado de la ejecución para el ejemplo de **ADMINISTRACIÓN DE EMPRESAS (SNIES 2051)**:
@@ -64,21 +59,10 @@ Total semejantes detectados en base de datos: 10
 ```
 
 ### ¿Por qué sí cumple con su función?
-- **Precisión Nominal**: Como se observa en el resultado 5, detectó "Administración de Empresas **Agropecuarias**". Esto es exactamente lo que se busca: programas que comparten la raíz temática pero tienen especializaciones o aplicaciones distintas.
-- **Identificación de Competencia**: Encuentra el mismo programa en diversas instituciones (Politécnico Grancolombiano, EAN, etc.), lo cual es vital para un Benchmarking de Mercado efectivo.
-- **Filtrado Inteligente**: El motor ignoró conectores como "de" y se centró exclusivamente en los términos de valor educativo.
-- **Veracidad Absoluta**: Los códigos SNIES recuperados existen realmente en el sistema nacional; no son datos simulados, lo que aporta confianza total al líder académico.
+- **Precisión Nominal**: Detectó "Administración de Empresas **Agropecuarias**", compartiendo la raíz temática pero diferenciando especializaciones.
+- **Identificación de Competencia**: Encuentra el mismo programa en diversas instituciones (Politécnico Grancolombiano, EAN, etc.).
+- **Veracidad Absoluta**: Los códigos SNIES recuperados existen realmente en el sistema nacional oficial.
 
-**En conclusión**: La sección cumple plenamente su función. Automatiza la búsqueda de competidores directos y complementarios basándose en la realidad del mercado colombiano, operando con una arquitectura ligera de frontend que no sobrecarga el backend.
-
-## 6. Ajustes Estéticos y de Formato (Márgenes)
-Durante el desarrollo, se identificó una inconsistencia en los márgenes de las páginas generadas después de la Metodología (como la Tabla de Contenido y las secciones de datos).
-
-### Problema:
-Debido a la naturaleza de los "page-breaks" en la generación de PDF mediante navegadores, el `padding-top` definido en el contenedor principal solo se aplicaba a la primera página de contenido. Esto causaba que las secciones siguientes aparecieran demasiado pegadas al borde superior de la hoja.
-
-### Solución Definitiva (Implementada):
-- **Uso de Reglas @page**: Se migró de una configuración manual a un sistema basado en `@page { margin: 30mm 20mm 35mm 35mm; }`. Esto garantiza que **todas** las páginas de contenido (incluyendo continuaciones) tengan el margen superior correcto.
-- **Excepción de Portada**: Se utilizó la regla `@page:first { margin: 0; }` para que la portada mantenga su diseño de sangrado completo (full-bleed) sin bordes blancos.
-- **Sincronización de Salto**: Se ajustó la portada con `page-break-after: always` para asegurar una transición limpia al contenido con margen automático.
-- **Resultado**: Simetría profesional en el 100% de las páginas del reporte, sin importar la longitud de las tablas o gráficas.
+---
+*Documento Técnico de Proyecto - SymbiAnalytics Intelligence Unit*
+*Versión definitiva de arquitectura - Abril 2026*

@@ -35,7 +35,7 @@ const clean = (val: string | null | undefined): string => {
 const generatePremiumLineChart = (years: string[], values: (number | null)[], label = '', width = 540, height = 200, suffix = ''): string => {
     const cleanValues = values.map(v => (v === null || isNaN(v)) ? 0 : v);
     if (cleanValues.length === 0) return '<div style="padding:15pt; text-align:center;">Dato no disponible.</div>';
-    
+
     // Color logic based on label
     const isMarket = label.toLowerCase().includes('mercado');
     const mainColor = isMarket ? '#6A717B' : '#2E3192';
@@ -45,7 +45,7 @@ const generatePremiumLineChart = (years: string[], values: (number | null)[], la
     const chartW = width - (margin * 2);
     const chartH = height - (margin * 2);
     const maxVal = Math.max(...cleanValues, 1) * 1.25;
-    
+
     const getY = (v: number) => height - margin - (v / maxVal) * chartH;
     const getX = (i: number) => margin + (cleanValues.length > 1 ? (i * chartW) / (cleanValues.length - 1) : chartW / 2);
 
@@ -92,19 +92,19 @@ const generateProgramBarChart = (data: Record<string, any>): string => {
     return `
     <div style="text-align:center; margin:10pt 0; page-break-inside:avoid;">
         <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-            <line x1="${margin}" y1="${height-margin}" x2="${width-margin}" y2="${height-margin}" stroke="#ccc" />
+            <line x1="${margin}" y1="${height - margin}" x2="${width - margin}" y2="${height - margin}" stroke="#ccc" />
             ${modules.map((m, i) => {
-                const rawVal = data[m]?.mean || 0;
-                const bH = (rawVal / maxVal) * (height - margin * 2);
-                const x = margin + (i * barW) + (barW * 0.15);
-                const normKey = m.toLowerCase().replace(/_/g, ' ').trim();
-                const cleanKey = Object.keys(labelMap).find(k => normKey.includes(k.replace(/_/g, ' '))) || m;
-                return `
-                    <rect x="${x}" y="${height-margin-bH}" width="${barW * 0.7}" height="${bH}" fill="#2E3192" rx="2" />
-                    <text x="${x + (barW * 0.35)}" y="${height-margin-bH-8}" font-size="8pt" font-weight="bold" fill="#000" text-anchor="middle">${fmt(rawVal, 1)}</text>
-                    <text x="${x + (barW * 0.35)}" y="${height-margin+18}" font-size="7pt" font-weight="bold" fill="#333" text-anchor="middle">${labelMap[cleanKey] || m.substring(0,8)}</text>
+        const rawVal = data[m]?.mean || 0;
+        const bH = (rawVal / maxVal) * (height - margin * 2);
+        const x = margin + (i * barW) + (barW * 0.15);
+        const normKey = m.toLowerCase().replace(/_/g, ' ').trim();
+        const cleanKey = Object.keys(labelMap).find(k => normKey.includes(k.replace(/_/g, ' '))) || m;
+        return `
+                    <rect x="${x}" y="${height - margin - bH}" width="${barW * 0.7}" height="${bH}" fill="#2E3192" rx="2" />
+                    <text x="${x + (barW * 0.35)}" y="${height - margin - bH - 8}" font-size="8pt" font-weight="bold" fill="#000" text-anchor="middle">${fmt(rawVal, 1)}</text>
+                    <text x="${x + (barW * 0.35)}" y="${height - margin + 18}" font-size="7pt" font-weight="bold" fill="#333" text-anchor="middle">${labelMap[cleanKey] || m.substring(0, 8)}</text>
                 `;
-            }).join('')}
+    }).join('')}
         </svg>
     </div>`;
 };
@@ -142,36 +142,44 @@ export const generateReportHTML = (data: ReportData): string => {
 <head>
 <meta charset="UTF-8">
 <style>
-    @page { size: letter; margin: 30mm 20mm 35mm 35mm; }
-    @page:first { margin: 0; }
+    @page { 
+        size: letter; 
+        margin-top: 30mm; 
+        margin-bottom: 25mm; 
+        margin-left: 35mm; 
+        margin-right: 20mm; 
+    }
+    @page coverPage { margin: 0; }
+    
     * { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    body { font-family: "Times New Roman", Times, serif; font-size: 11.5pt; color: #000; background: #fff; counter-reset: page 0; width: 215.9mm; }
+    body { font-family: "Times New Roman", Times, serif; font-size: 11.5pt; color: #000; background: #fff; counter-reset: page 0; width: 100%; }
     .formal-cover-page { 
-        position: relative; 
+        page: coverPage;
+        position: absolute; top: 0; left: 0; 
         height: 279.4mm; width: 215.9mm; 
-        background: linear-gradient(135deg, #0a1628 0%, #1a2a44 100%) !important; 
-        color: #ffffff !important; padding: 50mm 35mm !important;
-        display: flex; flex-direction: column; justify-content: space-between;
+        background: #ffffff !important; 
+        color: #0a1628 !important; padding: 50mm 35mm !important;
+        display: flex; flex-direction: column; justify-content: space-between; z-index: 1000;
         overflow: hidden;
-        page-break-after: always;
     }
     .cover-pattern { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; }
-    .cover-main-h1 { font-size: 42pt; font-weight: 800; color: #fff !important; line-height: 1.1; letter-spacing: -1pt; }
-    .cover-program-info { font-size: 20pt; border-left: 5pt solid #fff; padding-left: 20pt; margin-top: 35pt; color: #fff !important; line-height: 1.4; }
-    .doc-padding-wrap { width: 100%; text-align: justify; margin-top: 0; }
+    .cover-main-h1 { font-size: 42pt; font-weight: 800; color: #0a1628 !important; line-height: 1.1; letter-spacing: -1pt; }
+    .cover-program-info { font-size: 20pt; border-left: 5pt solid #0a1628; padding-left: 20pt; margin-top: 35pt; color: #0a1628 !important; line-height: 1.4; }
+    .doc-padding-wrap { width: 100%; text-align: justify; padding-bottom: 30mm; }
     
     /* FOOTER */
-    .page-footer { position: fixed; bottom: 5mm; left: 35mm; right: 20mm; height: 12mm; border-top: 1.5pt solid #000; font-size: 9.5pt; color: #000; background: #fff; z-index: 500; padding-top: 6pt; }
+    .page-footer { position: fixed; bottom: 8mm; left: 35mm; right: 20mm; height: auto; border-top: 1.5pt solid #000; font-size: 9.5pt; color: #000; background: #fff; z-index: 500; padding-top: 6pt; }
     .footer-flex { display: flex; justify-content: space-between; align-items: center; }
     .page-num::after { content: counter(page); }
     .footer-watermark { position: absolute; right: 0; bottom: -5pt; height: 35pt; opacity: 0.08; pointer-events: none; }
     
     /* SECTION HANDLING */
     h1 { font-size: 16pt; font-weight: bold; text-transform: uppercase; border-bottom: 3.5pt solid #000; padding-bottom: 6pt; margin-bottom: 25pt; page-break-before: always; color: #000 !important; counter-increment: page; }
-    h3 { font-size: 12.5pt; margin-top: 25pt; margin-bottom: 12pt; font-weight: bold; color: #2E3192 !important; border-left: 3pt solid #2E3192; padding-left: 10pt; }
+    h3 { font-size: 12pt; margin-top: 15pt; margin-bottom: 8pt; font-weight: bold; color: #2E3192 !important; border-left: 3pt solid #2E3192; padding-left: 10pt; }
     
     /* TABLES */
     table.formal-grid { width: 100%; border-collapse: collapse; border: 1.5pt solid #000; margin: 15pt 0; vertical-align: middle; }
+    table.formal-grid tr { page-break-inside: avoid; }
     table.formal-grid td { border: 0.75pt solid #000; padding: 7pt 10pt; color: #000 !important; font-size: 10.5pt; }
     .td-label { background: #f2f2f2; font-weight: bold; width: 40%; }
     
@@ -183,15 +191,19 @@ export const generateReportHTML = (data: ReportData): string => {
     .card-sub { font-size: 8pt; color: #888; margin-top: 3pt; }
 
     /* KPIs */
-    .kpi-h-box { background: #0a1628; color: #ffffff !important; padding: 14pt 20pt; border-radius: 4pt; margin-top: 25pt; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; }
-    .kpi-h-val { font-size: 26pt; font-weight: 800; color: #fff !important; }
-    .kpi-h-title { font-size: 10pt; font-weight: bold; color: #fff !important; }
+    .kpi-h-box { background: #f8f9fa; color: #333 !important; padding: 10pt 15pt; border-radius: 4pt; border-left: 4pt solid #0a1628; margin-top: 10pt; display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid; }
+    .kpi-h-val { font-size: 18pt; font-weight: 800; color: #0a1628 !important; }
+    .kpi-h-title { font-size: 8.5pt; font-weight: bold; text-transform: uppercase; color: #666 !important; }
     
     /* BOXES */
     .method-box { background: #f9f9f9; border-left: 3pt solid #2E3192; padding: 12pt 18pt; font-size: 10pt; font-style: italic; margin-bottom: 18pt; color: #444; line-height: 1.4; }
-    .intro-paragraph { margin-bottom: 18pt; line-height: 1.6; color: #333; }
+    .intro-paragraph { margin-bottom: 12pt; line-height: 1.5; color: #333; }
     .rationale-text { font-size: 9.5pt; font-style: italic; border-left: 2pt solid #6A717B; padding-left: 12pt; color: #555; margin-bottom: 20pt; line-height: 1.4; }
     .keep-together { page-break-inside: avoid; page-break-after: auto; margin-bottom: 25pt; }
+    
+    /* TOC */
+    .toc-item { display: flex; align-items: baseline; margin-bottom: 12pt; font-size: 11.5pt; color: #000 !important; }
+    .toc-dots { flex: 1; border-bottom: 1pt dotted #ccc; margin: 0 10pt; height: 10pt; }
 </style>
 </head>
 <body>
@@ -209,14 +221,14 @@ export const generateReportHTML = (data: ReportData): string => {
                 <span style="font-size:14pt; opacity:0.9;">${clean(p.departamento)} | SNIES ${clean(p.snies)}</span>
             </div>
         </div>
-        <div style="border-top:1px solid rgba(255,255,255,0.4); padding-top:15pt; display:flex; justify-content:space-between; align-items:flex-end; color:#fff !important; font-size:10pt;">
+        <div style="border-top:1px solid rgba(10,22,40,0.2); padding-top:15pt; display:flex; justify-content:space-between; align-items:flex-end; color:#0a1628 !important; font-size:10pt;">
             <div>
                 <div style="font-weight:bold;">Symbiotic Analytics // Intelligence Unit</div>
                 <div style="margin-top:2pt; opacity:0.8;">${fecha}</div>
             </div>
-            <div style="display:flex; gap:15pt; opacity:0.2;">
-                <img src="/logo_uniminuto.png" style="height:22pt; filter:brightness(0) invert(1);" />
-                <img src="/logo_symbiotic.png" style="height:22pt; filter:brightness(0) invert(1);" />
+            <div style="display:flex; gap:15pt; opacity:0.8;">
+                <img src="/logo_uniminuto.png" style="height:22pt;" />
+                <img src="/logo_symbiotic.png" style="height:22pt;" />
             </div>
         </div>
     </div>
@@ -283,17 +295,16 @@ export const generateReportHTML = (data: ReportData): string => {
         <!-- PÁGINA: TABLA DE CONTENIDO -->
         <div class="content-section">
             <h1>Tabla de Contenido</h1>
-            <div style="margin-top:20pt; width:100%;">
-                <ul style="list-style:none; line-height:2.4; font-size:11.5pt;">
-                    <li style="border-bottom:1px dotted #ccc;"><span>1. Identidad Institucional y del Programa</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>2. Análisis de Indicadores Clave (KPIs)</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>3. Perfil Demográfico del Estudiante</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>4. Benchmarking de Mercado (Geográfico)</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>5. Benchmarking por Sector</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>6. Benchmarking por Modalidad</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>7. Matriz de Diagnóstico Estratégico</span></li>
-                    <li style="border-bottom:1px dotted #ccc;"><span>8. Análisis de Programas Semejantes</span></li>
-                </ul>
+            <div style="margin-top:30pt; width:100%;">
+                <div class="toc-item"><span>1. IDENTIDAD INSTITUCIONAL Y DEL PROGRAMA</span><span class="toc-dots"></span><span>3</span></div>
+                <div class="toc-item"><span>2. ANÁLISIS DE INDICADORES CLAVE (KPIs)</span><span class="toc-dots"></span><span>4</span></div>
+                <div class="toc-item"><span>3. PERFIL DEMOGRÁFICO DEL ESTUDIANTE</span><span class="toc-dots"></span><span>6</span></div>
+                <div class="toc-item"><span>4. BENCHMARKING DE MERCADO (GEOGRÁFICO)</span><span class="toc-dots"></span><span>7</span></div>
+                <div class="toc-item"><span>5. BENCHMARKING POR SECTOR</span><span class="toc-dots"></span><span>9</span></div>
+                <div class="toc-item"><span>6. BENCHMARKING POR MODALIDAD</span><span class="toc-dots"></span><span>11</span></div>
+                <div class="toc-item"><span>7. MATRIZ DE DIAGNÓSTICO ESTRATÉGICO</span><span class="toc-dots"></span><span>12</span></div>
+                <div class="toc-item"><span>8. ANÁLISIS DE PROGRAMAS SEMEJANTES</span><span class="toc-dots"></span><span>13</span></div>
+                <div class="toc-item"><span>9. AFINIDAD POR NÚCLEO ACADÉMICO (NBC)</span><span class="toc-dots"></span><span>14</span></div>
             </div>
         </div>
 
@@ -349,17 +360,26 @@ export const generateReportHTML = (data: ReportData): string => {
                 <strong>¿Por qué este análisis?:</strong> Los indicadores internos permiten identificar señales de alerta en el ciclo de vida del estudiante (desde la admisión hasta la graduación) y establecer una línea base para medir el impacto de las estrategias institucionales.
             </p>
             <div class="keep-together">
-                <div class="kpi-h-box"><div><div class="kpi-h-title">Nuevos Ingresos (Histórico)</div><div class="kpi-h-val">${fmt(kpi.total_pcurso, 0)}</div></div></div>
+                <div class="kpi-h-box">
+                    <span class="kpi-h-title">Nuevos Ingresos (Histórico)</span>
+                    <span class="kpi-h-val">${fmt(kpi.total_pcurso, 0)}</span>
+                </div>
                 <h3>2.1 Nuevos Ingresos</h3>
                 ${generatePremiumLineChart(data.pcursoEvolution.years.map(y => y.toString()), data.pcursoEvolution.values, 'Programa')}
             </div>
             <div class="keep-together">
-                <div class="kpi-h-box"><div><div class="kpi-h-title">Matriculados Totales (Histórico)</div><div class="kpi-h-val">${fmt(kpi.total_matricula, 0)}</div></div></div>
+                <div class="kpi-h-box">
+                    <span class="kpi-h-title">Matriculados Totales</span>
+                    <span class="kpi-h-val">${fmt(kpi.total_matricula, 0)}</span>
+                </div>
                 <h3>2.2 Evolución de Matrícula</h3>
                 ${generatePremiumLineChart(data.matriculaEvolution.years.map(y => y.toString()), data.matriculaEvolution.values, 'Programa')}
             </div>
             <div class="keep-together">
-                <div class="kpi-h-box"><div><div class="kpi-h-title">Tasa de Deserción Anual (Promedio)</div><div class="kpi-h-val">${fmtPct(kpi.avg_desercion, 2)}</div></div></div>
+                <div class="kpi-h-box">
+                    <span class="kpi-h-title">Tasa de Deserción Anual (Promedio)</span>
+                    <span class="kpi-h-val">${fmtPct(kpi.avg_desercion, 2)}</span>
+                </div>
                 <h3>2.3 Deserción y Permanencia</h3>
                 <div class="method-box">
                     <strong>Metodología (SPADIES):</strong> La Tasa de Deserción Anual es calculada por el <strong>Ministerio de Educación Nacional (MEN)</strong> mediante el sistema SPADIES. Se calcula como el cociente entre el número de estudiantes que desertan en un periodo dado sobre el total de matriculados.
@@ -367,7 +387,10 @@ export const generateReportHTML = (data: ReportData): string => {
                 ${generatePremiumLineChart(data.desercionEvolution.years.map(y => y.toString()), data.desercionEvolution.values, 'Programa', 540, 200, '%')}
             </div>
             <div class="keep-together">
-                <div class="kpi-h-box"><div><div class="kpi-h-title">Calidad Académica (Saber Pro)</div><div class="kpi-h-val">${fmt(kpi.avg_saberpro, 1)}</div></div></div>
+                <div class="kpi-h-box">
+                    <span class="kpi-h-title">Calidad Académica (Saber Pro)</span>
+                    <span class="kpi-h-val">${fmt(kpi.avg_saberpro, 1)}</span>
+                </div>
                 <h3>2.4 Desempeño Saber Pro del Programa</h3>
                 <div class="method-box">
                     <strong>Contexto de Competencias:</strong> Los exámenes Saber Pro evalúan competencias genéricas esenciales para el desempeño profesional. Un puntaje alto refleja la eficacia del modelo pedagógico.
@@ -575,10 +598,10 @@ export const generateReportHTML = (data: ReportData): string => {
                 <tbody>
                     <tr>
                         <td class="td-label" style="width:25%;">Matrícula Total</td>
-                        <td style="text-align:center; font-weight:bold;">${fmt(kpi.total_matricula,0)}</td>
-                        <td style="text-align:center;">${fmt(mKpi.total_matricula,0)}</td>
-                        <td style="text-align:center;">${fmt(data.sectorKPIs.summary.total_matricula,0)}</td>
-                        <td style="text-align:center;">${fmt(data.modalityKPIs.summary.total_matricula,0)}</td>
+                        <td style="text-align:center; font-weight:bold;">${fmt(kpi.total_matricula, 0)}</td>
+                        <td style="text-align:center;">${fmt(mKpi.total_matricula, 0)}</td>
+                        <td style="text-align:center;">${fmt(data.sectorKPIs.summary.total_matricula, 0)}</td>
+                        <td style="text-align:center;">${fmt(data.modalityKPIs.summary.total_matricula, 0)}</td>
                     </tr>
                     <tr>
                         <td class="td-label">Deserción Anual (%)</td>
@@ -604,9 +627,9 @@ export const generateReportHTML = (data: ReportData): string => {
                     <tr>
                         <td class="td-label">Pares en Mercado (#)</td>
                         <td style="text-align:center; font-weight:bold;">1</td>
-                        <td style="text-align:center;">${fmt(mKpi.num_programs,0)}</td>
-                        <td style="text-align:center;">${fmt(data.sectorKPIs.summary.num_programs,0)}</td>
-                        <td style="text-align:center;">${fmt(data.modalityKPIs.summary.num_programs,0)}</td>
+                        <td style="text-align:center;">${fmt(mKpi.num_programs, 0)}</td>
+                        <td style="text-align:center;">${fmt(data.sectorKPIs.summary.num_programs, 0)}</td>
+                        <td style="text-align:center;">${fmt(data.modalityKPIs.summary.num_programs, 0)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -614,50 +637,128 @@ export const generateReportHTML = (data: ReportData): string => {
             <div class="content-section">
                 <h1>8. Análisis de Programas Semejantes</h1>
                 <p class="intro-paragraph">
-                    Este análisis identifica otros programas académicos en el territorio colombiano que comparten una identidad temática similar al programa evaluado. 
+                    Este análisis agrupa los programas académicos a nivel nacional que comparten la misma identidad temática y semántica. 
                 </p>
                 <div class="method-box">
-                    <strong>Algoritmo de Identidad:</strong> Se utiliza un motor de búsqueda por relevancia que tokeniza el nombre del programa y encuentra pares con una coincidencia semántica superior al 70%.
+                    <strong>Radiografía Nacional:</strong> El algoritmo semántico detectó <b>${data.similarAnalysis.totalNational}</b> programas equivalentes en todo el país.
+                    La competencia geográfica se distribuye principalmente en: ${data.similarAnalysis.topDepartments.map(d => `${d.name} (${d.count})`).join(', ')}.
                 </div>
 
-                <table class="formal-grid" style="font-size:8.5pt;">
-                    <thead style="background:#f2f2f2;">
-                        <tr>
-                            <th style="border:1pt solid #000; padding:6pt; text-align:left;">Programa Semejante</th>
-                            <th style="border:1pt solid #000; padding:6pt; text-align:left;">Institución</th>
-                            <th style="border:1pt solid #000; padding:6pt; text-align:center;">SNIES</th>
-                            <th style="border:1pt solid #000; padding:6pt; text-align:center;">Modalidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.similarPrograms.length > 0 ? data.similarPrograms.map(sp => `
+                <h3 style="font-size:11pt; color:#2E3192; margin-top:20pt; margin-bottom:10pt;">Top 10 Instituciones Competidoras (Dominio de Mercado)</h3>
+                <div style="margin: 15pt 0;">
+                    ${data.similarAnalysis.topInstitutions.map(inst => `
+                        <div style="margin-bottom: 12pt;">
+                            <div style="display:flex; justify-content:space-between; font-size:9.5pt; margin-bottom:5pt; text-transform:uppercase;">
+                                <span>${inst.name}</span>
+                                <span style="font-weight:bold;">${inst.count} programas</span>
+                            </div>
+                            <div style="background:#e0e0e0; height:14pt; border-radius:3pt; overflow:hidden;">
+                                <div style="background:#2E3192; width:${Math.min((inst.count / (data.similarAnalysis.topInstitutions[0]?.count || 1)) * 100, 100)}%; height:100%;"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${data.similarAnalysis.topInstitutions.length === 0 ? '<p style="color:#888; font-style:italic;">No hay datos de competencia suficientes para graficar.</p>' : ''}
+                </div>
+
+                <div style="page-break-inside: avoid; margin-top: 20pt; margin-bottom: 15pt;">
+                    <h3 style="font-size:11pt; color:#2E3192; margin-bottom:10pt;">Directorio de Relevancia (Top 10 Semejantes)</h3>
+                    <p style="font-size:9pt; color:#555; margin-bottom:10pt;">Identificación nominal de los programas con mayor similitud en su estructura y áreas de conocimiento.</p>
+                    <table class="formal-grid" style="font-size:8.5pt;">
+                        <thead style="background:#f2f2f2;">
                             <tr>
-                                <td style="font-weight:bold;">${clean(sp.programa)}</td>
-                                <td>${clean(sp.institucion)}</td>
-                                <td style="text-align:center;">${clean(sp.snies)}</td>
-                                <td style="text-align:center;">${clean(sp.modalidad)}</td>
+                                <th style="border:1pt solid #000; padding:6pt; text-align:left;">Programa Semejante</th>
+                                <th style="border:1pt solid #000; padding:6pt; text-align:left;">Institución</th>
+                                <th style="border:1pt solid #000; padding:6pt; text-align:center;">SNIES</th>
+                                <th style="border:1pt solid #000; padding:6pt; text-align:center;">Modalidad</th>
                             </tr>
-                        `).join('') : `
-                            <tr>
-                                <td colspan="4" style="text-align:center; padding:20pt; font-style:italic; color:#888;">
-                                    No se encontraron programas con alta similitud nominal en la base de datos actual.
-                                </td>
-                            </tr>
-                        `}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${data.similarPrograms.length > 0 ? data.similarPrograms.map(sp => `
+                                <tr>
+                                    <td style="font-weight:bold;">${clean(sp.programa)}</td>
+                                    <td>${clean(sp.institucion)}</td>
+                                    <td style="text-align:center;">${clean(sp.snies)}</td>
+                                    <td style="text-align:center;">${clean(sp.modalidad)}</td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="4" style="text-align:center; padding:20pt; font-style:italic; color:#888;">
+                                        No se encontraron programas con suficiente similitud semántica.
+                                    </td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div style="margin-top:50pt; text-align:center;">
-                <p style="font-size:10pt;">Fin del Informe Estratégico de Mercado</p>
-                <div style="margin-top:10pt;">
-                    <img src="/logo_symbiotic.png" style="height:50pt; opacity:0.75;" />
+            <!-- SECCIÓN 9: AFINIDAD POR NBC -->
+            <div class="content-section">
+                <h1>9. ANÁLISIS DE AFINIDAD ACADÉMICA (NBC)</h1>
+                <p class="intro-paragraph">
+                    Esta gráfica ilustra la concentración de la oferta oficial por <b>Núcleo Básico del Conocimiento (NBC)</b> definido por el Ministerio de Educación. Todos los programas listados aquí son sus "Hermanos Académicos" directos.
+                </p>
+                
+                <div class="method-box">
+                    <strong>Radiografía Académica:</strong> Existen <b>${data.nbcSimilarAnalysis.totalNational}</b> programas oficiales bajo este mismo Núcleo Académico. 
+                    El nivel de saturación regional concentra mayor oferta en: ${data.nbcSimilarAnalysis.topDepartments.map(d => `${d.name} (${d.count})`).join(', ')}.
                 </div>
+
+                <h3 style="font-size:11pt; color:#2E3192; margin-top:20pt; margin-bottom:10pt;">Actores Dominantes en el Núcleo Académico</h3>
+                
+                <div style="margin: 15pt 0;">
+                    ${data.nbcSimilarAnalysis.topInstitutions.map(inst => `
+                        <div style="margin-bottom: 12pt;">
+                            <div style="display:flex; justify-content:space-between; font-size:9.5pt; margin-bottom:5pt; text-transform:uppercase;">
+                                <span>${inst.name}</span>
+                                <span style="font-weight:bold;">${inst.count} programas afines</span>
+                            </div>
+                            <div style="background:#e0e0e0; height:14pt; border-radius:3pt; overflow:hidden;">
+                                <div style="background:#0a1628; width:${Math.min((inst.count / (data.nbcSimilarAnalysis.topInstitutions[0]?.count || 1)) * 100, 100)}%; height:100%;"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${data.nbcSimilarAnalysis.topInstitutions.length === 0 ? '<p style="color:#888; font-style:italic;">No se pudo agrupar un volumen suficiente de oferta para generar el gráfico.</p>' : ''}
+                </div>
+
+                <div style="page-break-inside: avoid; margin-top: 20pt; margin-bottom: 20pt;">
+                    <h3 style="font-size:11pt; color:#2E3192; margin-bottom:10pt;">Hermanos Académicos (Top 10 Afinidades NBC)</h3>
+                    
+                    <table class="formal-grid">
+                        <thead>
+                            <tr style="background:#f2f2f2; font-weight:bold;">
+                                <td style="width:35%">Programa Académico</td>
+                                <td style="width:35%">Institución</td>
+                                <td style="width:15%">SNIES</td>
+                                <td style="width:15%">Modalidad</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.nbcSimilarPrograms.map(p => `
+                                <tr>
+                                    <td>${clean(p.programa)}</td>
+                                    <td>${clean(p.institucion)}</td>
+                                    <td style="text-align:center;">${clean(p.snies)}</td>
+                                    <td style="text-align:center;">${clean(p.modalidad)}</td>
+                                </tr>
+                            `).join('')}
+                            ${data.nbcSimilarPrograms.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding:20pt; font-style:italic; color:#666;">No hay oferta regional adicional con este mismo NBC. Oportunidad estratégica de monopolio formativo.</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top:20pt; padding:15pt; background:#f9f9f9; border-left:4pt solid #2E3192;">
+                    <p style="font-size:9.5pt; color:#333; line-height:1.4;">
+                        <b>Conclusión Estratégica:</b> Eliminar las agrupaciones de tablas crudas y adoptar visualizaciones de concentración permite a la Alta Dirección identificar rápidamente monopolios, competidores fragmentados u oligopolios en el marco educativo nacional, facilitando decisiones directas sobre creación, cierre o modificación de programas.
+                    </p>
+                </div>
+            </div>
+
+            <div style="margin-top: 40pt; text-align: center; border-top: 1pt solid #eee; padding-top: 20pt;">
+                <p style="font-size:10pt; color:#333; font-weight:bold;">FIN DEL INFORME ESTRATÉGICO</p>
                 <p style="font-size:8.5pt; color:#666; margin-top:5pt;">Información procesada por el motor SymbiAnalytics v2.0</p>
             </div>
         </div>
-    </div>
-
     </div>
 
     </div>

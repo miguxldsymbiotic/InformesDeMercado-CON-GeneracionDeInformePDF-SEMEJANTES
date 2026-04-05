@@ -12,6 +12,13 @@ import {
     FilterParams
 } from './api';
 
+export interface SimilarAnalysis {
+    totalNational: number;
+    topDepartments: { name: string, count: number }[];
+    topInstitutions: { name: string, count: number }[];
+    localCompetitors: ProgramOption[];
+}
+
 export interface ReportData {
     program: ProgramOption;
     programKPIs: NationalKPIDashboard;
@@ -46,6 +53,9 @@ export interface ReportData {
     saberProArea: SaberProDashboardData;
     demographics: DemographicDistribution;
     similarPrograms: ProgramOption[];
+    nbcSimilarPrograms: ProgramOption[];
+    similarAnalysis: SimilarAnalysis;
+    nbcSimilarAnalysis: SimilarAnalysis;
     
     generatedAt: string;
 }
@@ -189,11 +199,61 @@ export const collectReportData = async (program: ProgramOption): Promise<ReportD
             })
             .filter(res => res.score >= Math.min(tokens.length, 2)) // Al menos 2 coincidencias o todas si son pocas
             .sort((a, b) => b.score - a.score)
-            .slice(0, 10)
             .map(res => res.program);
     };
 
     const similarPrograms = findSimilar(program, allProgs);
+    
+    // ENCUENTRA AFINIDAD POR NBC (MISMO NUCLEO, NOMBRES DISTINTOS)
+    const findNbcSimilar = (target: ProgramOption, others: ProgramOption[]) => {
+        return others
+            .filter(p => p.snies !== target.snies && p.nucleo === target.nucleo)
+            .map(p => {
+                // Score basado en compartir Area + Detallado + Nivel
+                let score = 0;
+                if (p.area === target.area) score += 2;
+                if (p.detallado === target.detallado) score += 1;
+                if (p.nivel === target.nivel) score += 1;
+                return { program: p, score };
+            })
+            .sort((a, b) => b.score - a.score)
+            .map(res => res.program);
+    };
+
+    const nbcSimilarPrograms = findNbcSimilar(program, allProgs);
+
+    const buildAnalysis = (progs: ProgramOption[], targetDept: string): SimilarAnalysis => {
+        const deptCounts: Record<string, number> = {};
+        const instCounts: Record<string, number> = {};
+        
+        progs.forEach(p => {
+            const d = p.departamento_principal || p.departamento;
+            if (d) deptCounts[d] = (deptCounts[d] || 0) + 1;
+            if (p.institucion) instCounts[p.institucion] = (instCounts[p.institucion] || 0) + 1;
+        });
+
+        const topDepartments = Object.entries(deptCounts)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 3);
+            
+        const topInstitutions = Object.entries(instCounts)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10);
+
+        const localCompetitors = progs.filter(p => (p.departamento_principal || p.departamento) === targetDept);
+
+        return {
+            totalNational: progs.length,
+            topDepartments,
+            topInstitutions,
+            localCompetitors
+        };
+    };
+
+    const similarAnalysis = buildAnalysis(similarPrograms, program.departamento_principal || program.departamento);
+    const nbcSimilarAnalysis = buildAnalysis(nbcSimilarPrograms, program.departamento_principal || program.departamento);
 
     return {
         program, programKPIs, areaKPIs, nbcKPIs, nivelKPIs, nacionalKPIs,
@@ -202,7 +262,10 @@ export const collectReportData = async (program: ProgramOption): Promise<ReportD
         sectorMatriculaEvolution, sectorPcursoEvolution, sectorGraduadosEvolution, sectorDesercionEvolution, sectorKPIs,
         modalityMatriculaEvolution, modalityPcursoEvolution, modalityGraduadosEvolution, modalityDesercionEvolution, modalityKPIs,
         saberProProgram, saberProArea, demographics,
-        similarPrograms,
+        similarPrograms: similarPrograms.slice(0, 10),
+        nbcSimilarPrograms: nbcSimilarPrograms.slice(0, 10),
+        similarAnalysis,
+        nbcSimilarAnalysis,
         generatedAt: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }),
     };
 };
